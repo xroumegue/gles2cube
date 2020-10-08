@@ -358,10 +358,11 @@ draw_frame(context_t *ctx)
   esRotate(&model, 2. * angle, 0.0f, 1.0f, 0.0f);
   esRotate(&model, angle, 0.0f, 0.0f, 1.0f);
 
+
   esMatrixMultiply(&m, &model, &ctx->view);
 
   XglUniformMatrix4fv(ctx->u_mat, 1, GL_FALSE, (GLfloat *)&m.m[0][0]);
-  XglUniform4f(ctx->u_color, 1.0f, 0.1f, 0.1f, 1.0f);
+  XglUniform4f(ctx->u_color, 0.1f, 1.0f, 0.1f, 1.0f);
   XglUniform1f(ctx->u_alpha, 0.5f);
 
   glDrawElements(GL_TRIANGLES,
