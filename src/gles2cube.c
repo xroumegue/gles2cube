@@ -354,6 +354,7 @@ draw_frame(context_t *ctx)
   // Compute matrix.
   esMatrixLoadIdentity(&model);
   angle = 360.0f * (ctx->frame % 1000) / 1000;
+  esTranslate(&model, -1.0f + 2.0f * (ctx->frame % 500) / 500, 0.0f, 0.0f);
   esRotate(&model, 3. * angle, 1.0f, 0.0f, 0.0f);
   esRotate(&model, 2. * angle, 0.0f, 1.0f, 0.0f);
   esRotate(&model, angle, 0.0f, 0.0f, 1.0f);
