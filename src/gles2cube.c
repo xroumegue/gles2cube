@@ -60,6 +60,28 @@ cube_vertices_g[] = {
 };
 
 static const GLfloat
+pyramid_vertices_g[] = {
+   -0.5f, -0.5f, -0.5f,
+   -0.5f, -0.5f,  0.5f,
+    0.5f, -0.5f,  0.5f,
+    0.5f, -0.5f, -0.5f,
+   -0.5f, -0.5f, -0.5f,
+    0.0f,  0.5f,  0.0f,
+    0.5f, -0.5f, -0.5f,
+    0.5f, -0.5f, -0.5f,
+    0.0f,  0.5f,  0.0f,
+    0.5f, -0.5f,  0.5f,
+    0.5f, -0.5f,  0.5f,
+    0.0f,  0.5f,  0.0f,
+   -0.5f, -0.5f,  0.5f,
+   -0.5f, -0.5f,  0.5f,
+    0.0f,  0.5f,  0.0f,
+   -0.5f, -0.5f, -0.5f,
+};
+
+static const GLfloat *vertices_g = cube_vertices_g;
+
+static const GLfloat
 cube_tex_coords_g[] = {
     0.0f, 0.0f,
     0.0f, 1.0f,
@@ -87,7 +109,28 @@ cube_tex_coords_g[] = {
     1.0f, 0.0f,
 };
 
-static const int cube_num_indices_g = 36;
+static const GLfloat
+pyramid_tex_coords_g[] = {
+    1.0f, 1.0f,
+    1.0f, 0.0f,
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+    0.5f, 1.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    0.5f, 1.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    1.0f, 0.0f,
+    0.5f, 1.0f,
+    0.0f, 0.0f,
+    1.0f, 0.0f,
+    0.5f, 1.0f,
+    0.0f, 0.0f
+};
+
+static const GLfloat *tex_coords_g = cube_tex_coords_g;
+
 static const GLuint
 cube_indices_g[] = {
     0, 2, 1,
@@ -108,6 +151,24 @@ cube_indices_g[] = {
     20, 23, 22,
     20, 22, 21
 };
+
+static const int cube_num_indices_g = sizeof(cube_indices_g) / sizeof(GLuint);
+
+static const GLuint
+pyramid_indices_g[] = {
+    0, 2, 1,
+    0, 3, 2,
+
+    4, 5, 6,
+    7, 8, 9,
+    10, 11, 12,
+    13, 14, 15
+};
+
+static const int pyramid_num_indices_g = sizeof(pyramid_indices_g) / sizeof(GLuint);
+
+static const GLuint *indices_g = cube_indices_g;
+static const int *num_indices_g = &cube_num_indices_g;
 
 #define TEX_WIDTH 8
 #define TEX_HEIGHT 8
@@ -313,12 +374,12 @@ setup(context_t *ctx)
   /* setup attributes */
   ctx->a_pos = XglGetAttribLocation(ctx->gl_prog, "a_pos");
   glVertexAttribPointer(ctx->a_pos, 3, GL_FLOAT, GL_FALSE,
-                        3 * sizeof (GLfloat), cube_vertices_g);
+                        3 * sizeof (GLfloat), vertices_g);
   XglEnableVertexAttribArray(ctx->a_pos);
 
   ctx->a_uv = XglGetAttribLocation(ctx->gl_prog, "a_uv");
   glVertexAttribPointer(ctx->a_uv, 2, GL_FLOAT, GL_FALSE,
-                        2 * sizeof (GLfloat), cube_tex_coords_g);
+                        2 * sizeof (GLfloat), tex_coords_g);
   glEnableVertexAttribArray(ctx->a_uv);
 
   esMatrixLoadIdentity(&pers);
@@ -367,7 +428,7 @@ draw_frame(context_t *ctx)
   XglUniform1f(ctx->u_alpha, 0.5f);
 
   glDrawElements(GL_TRIANGLES,
-                 cube_num_indices_g, GL_UNSIGNED_INT, cube_indices_g);
+                *num_indices_g, GL_UNSIGNED_INT, indices_g);
 }
 
 static void
@@ -387,7 +448,7 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
   int i;
   int opt;
 
-  while ((opt = getopt(argc, argv, "f:hH:W:")) != -1) {
+  while ((opt = getopt(argc, argv, "f:hH:W:p:")) != -1) {
 
     switch (opt) {
 
@@ -414,6 +475,24 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
     case 'W':
       ctx->width = atoi(optarg);
       break ;
+
+    case 'p':
+      switch (atoi(optarg)) {
+      case 1:
+        indices_g = pyramid_indices_g;
+        num_indices_g = &pyramid_num_indices_g;
+        vertices_g = pyramid_vertices_g;
+        tex_coords_g = pyramid_tex_coords_g;
+        break;
+      case 0:
+      default:
+        indices_g = cube_indices_g;
+        num_indices_g = &cube_num_indices_g;
+        vertices_g = cube_vertices_g;
+        tex_coords_g = cube_tex_coords_g;
+          break;
+      }
+      break;
 
     default:
       player_usage();
