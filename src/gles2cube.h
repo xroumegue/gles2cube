@@ -29,6 +29,7 @@ struct context_s {
   GLint u_color;
   GLint u_mat;
   GLint u_alpha;
+  GLint u_frame;
   ESMatrix view;
   unsigned int frame;
   unsigned int frames;

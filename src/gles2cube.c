@@ -240,15 +240,19 @@ static const GLchar *
 vertex_shader_g =
   "precision mediump float;                   \n"
 
+  "uniform float u_frame;                     \n"
   "uniform mat4 u_mat;                        \n"
   "attribute vec4 a_pos;                      \n"
   "attribute vec4 a_color;                    \n"
   "attribute vec2 a_uv;                       \n"
   "varying vec2 v_uv;                         \n"
   "varying vec4 v_color;                      \n"
+  "varying vec4 a_pos2;                       \n"
 
   "void main() {                              \n"
-  "   gl_Position = u_mat * a_pos;            \n"
+  "   a_pos2 = a_pos;                        \n"
+  "   a_pos2 *= vec4(u_frame, u_frame, u_frame, 1.0) ; \n"
+  "   gl_Position = u_mat * a_pos2;           \n"
   "   v_uv = a_uv;                            \n"
   "   v_color = a_color;                      \n"
   "}\n";
@@ -426,6 +430,7 @@ setup(context_t *ctx)
   ctx->u_mat = XglGetUniformLocation(ctx->gl_prog, "u_mat");
   ctx->u_color = XglGetUniformLocation(ctx->gl_prog, "u_color");
   ctx->u_alpha = XglGetUniformLocation(ctx->gl_prog, "u_alpha");
+  ctx->u_frame = XglGetUniformLocation(ctx->gl_prog, "u_frame");
 
   /* setup attributes */
   ctx->a_color = XglGetAttribLocation(ctx->gl_prog, "a_color");
@@ -470,6 +475,7 @@ draw_frame(context_t *ctx)
 {
   ESMatrix model, m;
   float angle;
+  float scale;
 
   XglClear(GL_COLOR_BUFFER_BIT);
 
@@ -487,6 +493,8 @@ draw_frame(context_t *ctx)
   XglUniformMatrix4fv(ctx->u_mat, 1, GL_FALSE, (GLfloat *)&m.m[0][0]);
   XglUniform4f(ctx->u_color, 0.1f, 1.0f, 0.1f, 1.0f);
   XglUniform1f(ctx->u_alpha, 0.5f);
+  scale = 0.25f + 0.75 * ((ctx->frame % 500) / 500.0f);
+  XglUniform1f(ctx->u_frame, scale);
 
   glDrawElements(GL_TRIANGLES,
                 *num_indices_g, GL_UNSIGNED_INT, indices_g);
