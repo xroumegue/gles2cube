@@ -25,6 +25,7 @@ struct context_s {
   GLuint fragment_shader;
   GLint a_pos;
   GLint a_uv;
+  GLint a_color;
   GLint u_color;
   GLint u_mat;
   GLint u_alpha;

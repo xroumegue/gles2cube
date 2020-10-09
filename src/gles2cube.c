@@ -82,6 +82,58 @@ pyramid_vertices_g[] = {
 static const GLfloat *vertices_g = cube_vertices_g;
 
 static const GLfloat
+cube_color_g[] = {
+   1.0f, 1.0f, 0.0f, 1.0f,
+   0.0f, 1.0f, 1.0f, 1.0f,
+   1.0f, 0.0f, 1.0f, 1.0f,
+   0.0f, 1.0f, 1.0f, 1.0f,
+   1.0f, 1.0f, 1.0f, 1.0f,
+   0.0f, 1.0f, 1.0f, 1.0f,
+   0.0f, 1.0f, 0.0f, 1.0f,
+   1.0f, 0.0f, 0.0f, 1.0f,
+   0.0f, 1.0f, 0.0f, 1.0f,
+   0.0f, 0.0f, 1.0f, 1.0f,
+   1.0f, 1.0f, 0.0f, 1.0f,
+   1.0f, 1.0f, 1.0f, 1.0f,
+   0.0f, 0.0f, 1.0f, 1.0f,
+   0.0f, 1.0f, 0.0f, 1.0f,
+   1.0f, 0.0f, 0.0f, 1.0f,
+   1.0f, 1.0f, 1.0f, 1.0f,
+   0.0f, 1.0f, 1.0f, 1.0f,
+   1.0f, 0.0f, 1.0f, 1.0f,
+   0.0f, 0.0f, 1.0f, 1.0f,
+   0.0f, 1.0f, 1.0f, 1.0f,
+   0.0f, 0.0f, 0.0f, 1.0f,
+   1.0f, 1.0f, 0.0f, 1.0f,
+   0.0f, 0.0f, 1.0f, 1.0f,
+   1.0f, 0.0f, 0.0f, 1.0f,
+};
+
+
+static const GLfloat
+pyramid_color_g[] = {
+   1.0f, 0.0f, 0.0f, 1.0f,
+   0.0f, 1.0f, 0.0f, 1.0f,
+   0.0f, 0.0f, 1.0f, 1.0f,
+   1.0f, 1.0f, 0.0f, 1.0f,
+   0.0f, 1.0f, 0.0f, 1.0f,
+   0.0f, 0.0f, 1.0f, 1.0f,
+   1.0f, 0.0f, 0.0f, 1.0f,
+   1.0f, 1.0f, 0.0f, 1.0f,
+   0.0f, 1.0f, 1.0f, 1.0f,
+   1.0f, 0.0f, 1.0f, 1.0f,
+   0.0f, 1.0f, 0.0f, 1.0f,
+   1.0f, 1.0f, 0.0f, 1.0f,
+   0.0f, 1.0f, 1.0f, 1.0f,
+   1.0f, 1.0f, 1.0f, 1.0f,
+   0.0f, 1.0f, 0.0f, 1.0f,
+   1.0f, 0.0f, 1.0f, 1.0f,
+};
+
+static const GLfloat *color_g = cube_color_g;
+
+
+static const GLfloat
 cube_tex_coords_g[] = {
     0.0f, 0.0f,
     0.0f, 1.0f,
@@ -190,12 +242,15 @@ vertex_shader_g =
 
   "uniform mat4 u_mat;                        \n"
   "attribute vec4 a_pos;                      \n"
+  "attribute vec4 a_color;                    \n"
   "attribute vec2 a_uv;                       \n"
   "varying vec2 v_uv;                         \n"
+  "varying vec4 v_color;                      \n"
 
   "void main() {                              \n"
   "   gl_Position = u_mat * a_pos;            \n"
   "   v_uv = a_uv;                            \n"
+  "   v_color = a_color;                      \n"
   "}\n";
 
 static const GLchar *
@@ -205,10 +260,11 @@ fragment_shader_g =
   "uniform float u_alpha;                             \n"
   "uniform sampler2D u_tex;                           \n"
   "varying vec2 v_uv;                                 \n"
+  "varying vec4 v_color;                              \n"
   "void main() {                                      \n"
 
   "vec4 t = texture2D(u_tex, v_uv);                   \n"
-  "       gl_FragColor = mix(u_color, t, u_alpha);    \n"
+  "       gl_FragColor = mix(v_color, t, u_alpha);    \n"
   "}\n";
 
 static void
@@ -372,6 +428,11 @@ setup(context_t *ctx)
   ctx->u_alpha = XglGetUniformLocation(ctx->gl_prog, "u_alpha");
 
   /* setup attributes */
+  ctx->a_color = XglGetAttribLocation(ctx->gl_prog, "a_color");
+  glVertexAttribPointer(ctx->a_color, 4, GL_FLOAT, GL_FALSE,
+                        4 * sizeof (GLfloat), color_g);
+  XglEnableVertexAttribArray(ctx->a_color);
+
   ctx->a_pos = XglGetAttribLocation(ctx->gl_prog, "a_pos");
   glVertexAttribPointer(ctx->a_pos, 3, GL_FLOAT, GL_FALSE,
                         3 * sizeof (GLfloat), vertices_g);
@@ -483,6 +544,7 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
         num_indices_g = &pyramid_num_indices_g;
         vertices_g = pyramid_vertices_g;
         tex_coords_g = pyramid_tex_coords_g;
+        color_g = pyramid_color_g;
         break;
       case 0:
       default:
@@ -490,7 +552,8 @@ parse_cmdline(context_t *ctx, int argc, char *argv[])
         num_indices_g = &cube_num_indices_g;
         vertices_g = cube_vertices_g;
         tex_coords_g = cube_tex_coords_g;
-          break;
+        color_g = cube_color_g;
+        break;
       }
       break;
 
